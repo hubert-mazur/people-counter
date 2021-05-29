@@ -18,14 +18,9 @@ ret, frame = video.read()
 
 frame = imutils.resize(frame, width=min(WIDTH, frame.shape[1]))
 height, width, channels = frame.shape
-writer = cv2.VideoWriter('output/output.mov', cv2.VideoWriter_fourcc(*'XVID'), 20, (width, height))
+writer = cv2.VideoWriter('output/output.mov', cv2.VideoWriter_fourcc(*'XVID'), 16, (width, height))
 
-
-i = 1
 while ret:
-    print(f'processing {i} frame...')
-    i += 1
-
     frame = imutils.resize(frame, width=min(WIDTH, frame.shape[1]))
     (rects, weights) = hog.detectMultiScale(frame, winStride=(4, 4), padding=(8, 8), scale=1.05)
 
@@ -37,6 +32,7 @@ while ret:
 
     rects = np.array([[x, y, x + w, y + h] for (x, y, w, h) in rects])
     pick = non_max_suppression(rects, probs=None, overlapThresh=0.65)
+    cv2.putText(frame, f'Total Persons : {len(rects) - 1}', (40, 70), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 0, 0), 2)
     writer.write(frame)
     # cv2.imwrite(f'test/{i}.png', frame)
     ret, frame = video.read()
