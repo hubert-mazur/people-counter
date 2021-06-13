@@ -4,6 +4,7 @@ import cv2
 import imutils
 import numpy as np
 from imutils.object_detection import non_max_suppression
+import os
 
 from progress import progress_bar
 
@@ -12,11 +13,15 @@ ap.add_argument("-i", "--video", required=True, help="path to video")
 filename = vars(ap.parse_args())['video']
 video = cv2.VideoCapture(filename)
 
+if not os.path.dirname('output'):
+    os.mkdir('output')
+
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
 max_width = 1000
 max_frame = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+fps = int(video.get(cv2.CAP_PROP_FPS))
 
 ret, frame = video.read()
 frame = imutils.resize(frame, width=min(max_width, frame.shape[1]))
@@ -38,7 +43,7 @@ while ret:
 
     rects = np.array([[x, y, x + w, y + h] for (x, y, w, h) in rects])
     pick = non_max_suppression(rects, probs=None, overlapThresh=0.65)
-    cv2.putText(frame, f'Total Persons : {len(rects)}', (40, 70), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 0, 0), 2)
+    cv2.putText(frame, f'Total Persons : {len(rects)}', (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 255), 1)
     writer.write(frame)
 
     i += 1
